@@ -1,18 +1,17 @@
-package com.ideaprojects.bloomstore.app;
+package main.java.bloomstore.app;
 
-import com.ideaprojects.bloomstore.model.*;
-import com.ideaprojects.bloomstore.service.Bouquet;
-import com.ideaprojects.bloomstore.util.FileStorage;
+import main.java.bloomstore.model.*;
+import main.java.bloomstore.service.Bouquet;
+import main.java.bloomstore.util.FileStorage;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Scanner;
 import java.nio.file.Path;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("+++++++ BloomStore Flower Store console application (com.ideaprojects.bloomstore) +++++++");
+        System.out.println("+++++++ BloomStore Flower Store console application (main.java.bloomstore) +++++++");
 
         Flower r1 = new Rose(3.50, 40.0, LocalDate.now().minusDays(1), 90, 12);
         Flower r2 = new Rose(4.00, 50.0, LocalDate.now().minusDays(2), 75, 8);

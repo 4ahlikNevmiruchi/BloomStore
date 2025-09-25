@@ -1,11 +1,10 @@
-package com.ideaprojects.bloomstore.service;
+package main.java.bloomstore.service;
 
-import com.ideaprojects.bloomstore.model.Accessory;
-import com.ideaprojects.bloomstore.model.Flower;
+import main.java.bloomstore.model.Accessory;
+import main.java.bloomstore.model.Flower;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
