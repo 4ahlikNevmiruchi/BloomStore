@@ -1,8 +1,8 @@
-package main.java.bloomstore.util;
+package com.ideaprojects.bloomstore.util;
 
-import main.java.bloomstore.model.Accessory;
-import main.java.bloomstore.model.Flower;
-import main.java.bloomstore.service.Bouquet;
+import com.ideaprojects.bloomstore.model.Accessory;
+import com.ideaprojects.bloomstore.model.Flower;
+import com.ideaprojects.bloomstore.service.Bouquet;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;

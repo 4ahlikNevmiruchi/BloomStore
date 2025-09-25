@@ -1,4 +1,4 @@
-package main.java.bloomstore.model;
+package com.ideaprojects.bloomstore.model;
 
 public enum Accessory {
     WRAPPING("Wrapping paper", 5.0),

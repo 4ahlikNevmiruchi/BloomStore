@@ -1,4 +1,4 @@
-package main.java.bloomstore.model;
+package com.ideaprojects.bloomstore.model;
 
 import java.time.LocalDate;
 

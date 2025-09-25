@@ -1,7 +1,7 @@
-package main.java.bloomstore.service;
+package com.ideaprojects.bloomstore.service;
 
-import main.java.bloomstore.model.Accessory;
-import main.java.bloomstore.model.Flower;
+import com.ideaprojects.bloomstore.model.Accessory;
+import com.ideaprojects.bloomstore.model.Flower;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,8 +1,8 @@
-package main.java.bloomstore.app;
+package com.ideaprojects.bloomstore.app;
 
-import main.java.bloomstore.model.*;
-import main.java.bloomstore.service.Bouquet;
-import main.java.bloomstore.util.FileStorage;
+import com.ideaprojects.bloomstore.model.*;
+import com.ideaprojects.bloomstore.service.Bouquet;
+import com.ideaprojects.bloomstore.util.FileStorage;
 
 import java.io.IOException;
 import java.time.LocalDate;
