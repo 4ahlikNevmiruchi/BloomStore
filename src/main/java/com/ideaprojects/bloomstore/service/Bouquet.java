@@ -62,9 +62,9 @@ public class Bouquet {
         for (Flower f : flowers) sb.append(" - ").append(f.description()).append('\n');
         if (!accessories.isEmpty()) {
             sb.append("Accessories:\n");
-            for (Accessory a : accessories) sb.append(" - ").append(a.getDisplayName()).append(String.format(" (%.2f", a.getPrice())).append('\n');
+            for (Accessory a : accessories) sb.append(" - ").append(a.getDisplayName()).append(String.format(" (%.2f $$$)", a.getPrice())).append('\n');
         }
-        sb.append(String.format("Total price: %.2f\n", calculateTotalPrice()));
+        sb.append(String.format("Total price: %.2f $$$\n", calculateTotalPrice()));
         return sb.toString();
     }
 }

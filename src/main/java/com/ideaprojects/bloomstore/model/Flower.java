@@ -52,7 +52,7 @@ public abstract class Flower implements Comparable<Flower> {
 
     public String description() {
         long days = ChronoUnit.DAYS.between(cutDate, LocalDate.now());
-        return String.format("%s (%.1f cm) cut %d days ago, freshness=%d%%, price=%.2f", name, stemLengthCm, days, freshnessLevel, price);
+        return String.format("%s (%.1f cm) cut %d days ago, freshness = %d%%, price = %.2f", name, stemLengthCm, days, freshnessLevel, price);
     }
 
     @Override

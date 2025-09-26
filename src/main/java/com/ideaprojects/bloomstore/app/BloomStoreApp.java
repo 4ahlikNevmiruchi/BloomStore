@@ -58,6 +58,9 @@ public class BloomStoreApp {
         bouquet.addFlower(new Tulip(1.50, 30.0, LocalDate.now(), 95, "red"));
         bouquet.addFlower(new Lily(2.80, 45.0, LocalDate.now().minusDays(3), 60, true));
 
+        bouquet.addAccessory(Accessory.WRAPPING);
+        bouquet.addAccessory(Accessory.RIBBON);
+
         System.out.println("Bouquet created!");
         showBouquet();
     }
