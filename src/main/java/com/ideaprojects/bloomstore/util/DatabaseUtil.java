@@ -1,17 +1,29 @@
 package com.ideaprojects.bloomstore.util;
 
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public final class DatabaseUtil {
-    private static final String DB_URL = "jdbc:sqlite:bloomstore.db";
+    private static final String DATA_DIR = "data";
+    private static final String DB_FILE = "bloomstore.db";
+    private static final String DB_URL = "jdbc:sqlite:" + DATA_DIR + File.separator + DB_FILE;
 
     private DatabaseUtil() {}
 
     public static Connection getConnection() throws SQLException {
+        // Ensure data directory exists
+        ensureDataDirectoryExists();
         return DriverManager.getConnection(DB_URL);
+    }
+
+    private static void ensureDataDirectoryExists() {
+        File dataDir = new File(DATA_DIR);
+        if (!dataDir.exists()) {
+            dataDir.mkdirs();
+        }
     }
 
     public static void initializeDatabase() throws SQLException {
@@ -70,7 +82,10 @@ public final class DatabaseUtil {
                 )
                 """);
 
-            System.out.println("Database initialized successfully");
+            System.out.println("Database initialized successfully at: " + DATA_DIR + File.separator + DB_FILE);
         }
+    }
+    public static String getDatabasePath() {
+        return DATA_DIR + File.separator + DB_FILE;
     }
 }
