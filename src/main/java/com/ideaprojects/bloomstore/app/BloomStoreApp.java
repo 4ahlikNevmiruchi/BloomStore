@@ -2,20 +2,33 @@ package com.ideaprojects.bloomstore.app;
 
 import com.ideaprojects.bloomstore.model.*;
 import com.ideaprojects.bloomstore.service.Bouquet;
-import com.ideaprojects.bloomstore.util.FileStorage;
+import com.ideaprojects.bloomstore.util.*;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.time.LocalDate;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
 public class BloomStoreApp {
     private final Scanner scanner = new Scanner(System.in);
     private final Bouquet bouquet = new Bouquet();
+    private List<Flower> availableFlowers;
 
     public void run() {
         System.out.println("+++++++ BloomStore Flower Store console application +++++++");
+
+        // Initialize database
+        try {
+            DatabaseUtil.initializeDatabase();
+            DatabaseStorage.initializeSampleFlowers();
+            availableFlowers = DatabaseStorage.loadAllFlowers();
+            System.out.println("Loaded " + availableFlowers.size() + " flowers from database");
+        } catch (SQLException e) {
+            System.err.println("Failed to initialize database: " + e.getMessage());
+            return;
+        }
 
         System.out.println("Let's start with building a bouquet");
 
@@ -23,60 +36,63 @@ public class BloomStoreApp {
         while (building) {
             System.out.println("Choose an option to add to your bouquet:");
             System.out.println("Hint: Flower (Price | Stem length | Freshness | Flower specific feature)");
-            System.out.println("1.    Rose   (3.50  | 40cm        | 90        | 12 thorns              )");
-            System.out.println("2.    Rose   (4.00  | 50cm        | 75        | 8 thorns               )");
-            System.out.println("3.    Tulip  (1.50  | 30cm        | 95        | red                    )");
-            System.out.println("4.    Lily   (2.80  | 45cm        | 60        | with aroma             )");
-            System.out.println("5.    Tulip  (1.70  | 35cm        | 85        | yellow                 )");
-            System.out.println("6.    Lily   (3.20  | 42cm        | 80        | no aroma               )");
-            System.out.println("7.    Rose   (5.00  | 55cm        | 70        | 15 thorns              )");
-            System.out.println("8.    Tulip  (2.00  | 28cm        | 90        | pink                   )");
-            System.out.println("9. Add accessory");
+
+            // Display flowers from a database
+            for (int i = 0; i < availableFlowers.size(); i++) {
+                Flower f = availableFlowers.get(i);
+                String specific = "";
+                if (f instanceof Rose r) {
+                    specific = r.getThornCount() + " thorns";
+                } else if (f instanceof Tulip t) {
+                    specific = t.getColor();
+                } else if (f instanceof Lily l) {
+                    specific = l.isFragrant() ? "with aroma" : "no aroma";
+                }
+                System.out.printf("%d.    %s   (%.2f  | %.0fcm        | %d        | %-23s)\n",
+                        i + 1, f.getName(), f.getPrice(), f.getStemLengthCm(), f.getFreshnessLevel(), specific);
+            }
+
+            System.out.println((availableFlowers.size() + 1) + ". Add accessory");
             System.out.println("0. Finish bouquet building");
 
             System.out.print("Your choice: ");
             int choice = readInt();
 
-            switch (choice) {
-                case 1 -> bouquet.addFlower(new Rose(3.50, 40.0, LocalDate.now().minusDays(1), 90, 12));
-                case 2 -> bouquet.addFlower(new Rose(4.00, 50.0, LocalDate.now().minusDays(2), 75, 8));
-                case 3 -> bouquet.addFlower(new Tulip(1.50, 30.0, LocalDate.now(), 95, "red"));
-                case 4 -> bouquet.addFlower(new Lily(2.80, 45.0, LocalDate.now().minusDays(3), 60, true));
-                case 5 -> bouquet.addFlower(new Tulip(1.70, 35.0, LocalDate.now().minusDays(1), 85, "yellow"));
-                case 6 -> bouquet.addFlower(new Lily(3.20, 42.0, LocalDate.now().minusDays(2), 80, false));
-                case 7 -> bouquet.addFlower(new Rose(5.00, 55.0, LocalDate.now(), 70, 15));
-                case 8 -> bouquet.addFlower(new Tulip(2.00, 28.0, LocalDate.now(), 90, "pink"));
-                case 9 -> {
-                    boolean accessoryMenu = true;
-                    while (accessoryMenu) {
-                        System.out.println("Choose accessory:");
-                        System.out.println("1. Wrapping");
-                        System.out.println("2. Ribbon");
-                        System.out.println("3. Return to flower selection");
+            if (choice >= 1 && choice <= availableFlowers.size()) {
+                Flower selectedFlower = availableFlowers.get(choice - 1);
+                // Create a copy of the flower to add to bouquet
+                Flower flowerCopy = copyFlower(selectedFlower);
+                bouquet.addFlower(flowerCopy);
+            } else if (choice == availableFlowers.size() + 1) {
+                boolean accessoryMenu = true;
+                while (accessoryMenu) {
+                    System.out.println("Choose accessory:");
+                    System.out.println("1. Wrapping");
+                    System.out.println("2. Ribbon");
+                    System.out.println("3. Return to flower selection");
 
-                        int acc = readInt();
-                        switch (acc) {
-                            case 1 -> {
-                                bouquet.addAccessory(Accessory.WRAPPING);
-                                accessoryMenu = false;
-                            }
-                            case 2 -> {
-                                bouquet.addAccessory(Accessory.RIBBON);
-                                accessoryMenu = false;
-                            }
-                            case 3 -> {
-                                System.out.println("Returning to flower selection...");
-                                accessoryMenu = false;
-                            }
-                            default -> System.out.println("Invalid accessory choice, try again.");
+                    int acc = readInt();
+                    switch (acc) {
+                        case 1 -> {
+                            bouquet.addAccessory(Accessory.WRAPPING);
+                            accessoryMenu = false;
                         }
+                        case 2 -> {
+                            bouquet.addAccessory(Accessory.RIBBON);
+                            accessoryMenu = false;
+                        }
+                        case 3 -> {
+                            System.out.println("Returning to flower selection...");
+                            accessoryMenu = false;
+                        }
+                        default -> System.out.println("Invalid accessory choice, try again.");
                     }
                 }
-                case 0 -> {
-                    System.out.println("Bouquet building finished!");
-                    building = false;
-                }
-                default -> System.out.println("Invalid choice, please try again.");
+            } else if (choice == 0) {
+                System.out.println("Bouquet building finished!");
+                building = false;
+            } else {
+                System.out.println("Invalid choice, please try again.");
             }
             showBouquet();
         }
@@ -89,7 +105,8 @@ public class BloomStoreApp {
             System.out.println("1. Sort flowers in bouquet by freshness");
             System.out.println("2. Find flowers in bouquet by stem length range");
             System.out.println("3. Show bouquet details");
-            System.out.println("4. Save current bouquet in .txt file");
+            System.out.println("4. Save current bouquet to database");
+            System.out.println("5. Load saved bouquet from database");
             System.out.println("0. Exit");
 
             System.out.print("Your choice: ");
@@ -99,7 +116,8 @@ public class BloomStoreApp {
                 case 1 -> handleSort();
                 case 2 -> handleFindRange();
                 case 3 -> showBouquet();
-                case 4 -> bouquetFileSave();
+                case 4 -> saveBouquetToDatabase();
+                case 5 -> loadBouquetFromDatabase();
                 case 0 -> {
                     System.out.println("Finishing running");
                     running = false;
@@ -107,6 +125,20 @@ public class BloomStoreApp {
                 default -> System.out.println("Invalid option, read carefully");
             }
         }
+    }
+
+    private Flower copyFlower(Flower original) {
+        if (original instanceof Rose r) {
+            return new Rose(r.getPrice(), r.getStemLengthCm(), r.getCutDate(),
+                    r.getFreshnessLevel(), r.getThornCount());
+        } else if (original instanceof Tulip t) {
+            return new Tulip(t.getPrice(), t.getStemLengthCm(), t.getCutDate(),
+                    t.getFreshnessLevel(), t.getColor());
+        } else if (original instanceof Lily l) {
+            return new Lily(l.getPrice(), l.getStemLengthCm(), l.getCutDate(),
+                    l.getFreshnessLevel(), l.isFragrant());
+        }
+        return original;
     }
 
     private void handleSort() {
@@ -155,13 +187,53 @@ public class BloomStoreApp {
         System.out.printf("Total price: %.2f\n", bouquet.calculateTotalPrice());
     }
 
-    private void bouquetFileSave() {
-        Path out = Path.of("bouquet-saved.txt");
+    private void saveBouquetToDatabase() {
+        System.out.print("Enter a name for this bouquet: ");
+        scanner.nextLine(); // consume newline
+        String name = scanner.nextLine();
+
         try {
-            FileStorage.saveBouquet(bouquet, out);
-            System.out.println("Bouquet saved to: " + out.toAbsolutePath());
-        } catch (IOException e) {
-            System.err.println("Failed to save bouquet: " + e.getMessage());
+            int bouquetId = DatabaseStorage.saveBouquet(bouquet, name);
+            System.out.println("Bouquet saved to database with ID: " + bouquetId);
+        } catch (SQLException e) {
+            System.err.println("Failed to save bouquet to database: " + e.getMessage());
+        }
+    }
+
+    private void loadBouquetFromDatabase() {
+        try {
+            List<String> savedBouquets = DatabaseStorage.getSavedBouquets();
+
+            if (savedBouquets.isEmpty()) {
+                System.out.println("No saved bouquets found in database");
+                return;
+            }
+
+            System.out.println("Saved bouquets:");
+            for (String bouquetInfo : savedBouquets) {
+                System.out.println(bouquetInfo);
+            }
+
+            System.out.print("Enter bouquet ID to load: ");
+            int id = readInt();
+
+            Bouquet loaded = DatabaseStorage.loadBouquet(id);
+            // Replace current bouquet
+            bouquet.getFlowers().clear();
+            bouquet.getAccessories().clear();
+
+            for (Flower f : loaded.getFlowers()) {
+                bouquet.addFlower(f);
+            }
+            for (Accessory a : loaded.getAccessories()) {
+                bouquet.addAccessory(a);
+            }
+
+            System.out.println("Bouquet loaded successfully!");
+            showBouquet();
+
+        } catch (SQLException e) {
+            System.err.println("Failed to load bouquet: " + e.getMessage());
         }
     }
 
